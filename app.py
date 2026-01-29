@@ -1,4 +1,4 @@
-# SocialSentry backend - Official Anthropic Claude API
+# SocialSentry backend
 import os
 import json
 import time
@@ -8,7 +8,7 @@ from flask import Flask, render_template, jsonify, request
 from dotenv import load_dotenv
 from anthropic import Anthropic
 
-# === Load env ===
+#  Load env
 load_dotenv()
 
 
@@ -17,13 +17,14 @@ app = Flask(__name__, template_folder="templates", static_folder="static")
 TWEET_CSV = os.path.join("data", "sample_tweets.csv")
 ALERTS = []
 
-# === Anthropic API ===
+# Import libraries
 import requests
 from urllib.parse import quote
 
-# === Geocode Cache ===
+# Geocode Cache
 GEOCODE_CACHE = {}
 
+#get location fuction
 def geocode_location(location_str):
     if not location_str or location_str.strip() in ["", "Unknown"]:
         return None, None
@@ -62,14 +63,14 @@ if not ANTHROPIC_API_KEY or ANTHROPIC_API_KEY.strip() == "":
 
 client = Anthropic(api_key=ANTHROPIC_API_KEY)
 
-# UPDATED NOVEMBER 2025+ MODEL NAMES
-MODEL = "claude-sonnet-4-5-20250929"   # Best balance of intelligence & speed
-# MODEL = "claude-3-haiku-latest"    # Uncomment for faster/cheaper (still very good for classification)
+# Initialize anthropic Model name 
+MODEL = "claude-sonnet-4-5-20250929"   
 
+#print the model to confirm its the model you are using
 print(f"✅ Using Anthropic model: {MODEL}")
 
 
-# === Prompt Template ===
+#  Prompt Template for the national security classifier 
 PROMPT = """
 You are a national security AI classifier.
 
@@ -93,7 +94,7 @@ Return ONLY the JSON.
 
 
 
-# === Analysis Fn ===
+# Analysis Function
 def analyze_tweet(text: str):
     print("\n============================")
     print("Analyzing Tweet:")
@@ -145,7 +146,7 @@ def analyze_tweet(text: str):
         }
 
 
-# === Tweet Stream ===
+# Fuction to replicate a live  Tweet Stream 
 def tweet_producer():
     print("\n=== Tweet Producer Running ===\n")
 
@@ -193,7 +194,7 @@ def tweet_producer():
 
         time.sleep(1)
 
-# === Routes ===
+# Flask routes
 @app.route("/")
 def index():
     return render_template("dashboard.html")
@@ -211,7 +212,7 @@ def analyze_text():
     return jsonify({"text": text, "analysis": result})
 
 
-# === Run ===
+# RUN flask app
 if __name__ == "__main__":
     t = threading.Thread(target=tweet_producer, daemon=True)
     t.start()
