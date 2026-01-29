@@ -1,0 +1,31 @@
+tweet_id,text,user,created_at,location
+1,"There will be a peaceful protest at City Hall at 5pm. Bring banners!",user1,2025-11-01 09:00:00,Nairobi
+2,"Join us for a community clean-up at Uhuru Park tomorrow 8am!",user2,2025-11-01 09:05:00,Nairobi
+3,"Gunshots heard near Westlands. Avoid the area.",user3,2025-11-01 10:00:00,Nairobi
+4,"Beautiful sunrise at Diani Beach today! Perfect for a morning walk.",user4,2025-11-01 10:30:00,Diani
+5,"Fire outbreak at 3rd Street. Emergency teams on site.",user5,2025-11-01 11:00:00,Kisumu
+6,"New library opening in Kibera today! Free books for all kids.",user6,2025-11-01 11:15:00,Nairobi
+7,"Police blocking Thika Road. Heavy traffic — use alternative routes.",user7,2025-11-01 11:30:00,Thika
+8,"Amazing street food festival at Mama Ngina Drive this weekend!",user8,2025-11-01 12:00:00,Mombasa
+9,"Youths burning tires on Mombasa Road. Traffic at a standstill.",user9,2025-11-01 12:15:00,Mombasa
+10,"Free medical camp at Nakuru Showground tomorrow 9am–3pm.",user10,2025-11-01 12:45:00,Nakuru
+11,"Bridge collapsed in Kericho after heavy rains. Avoid the route.",user11,2025-11-01 13:00:00,Kericho
+12,"Great turnout at the Kisii Cultural Festival! Proud to be here.",user12,2025-11-01 13:30:00,Kisii
+13,"Riot police deployed in Eldoret CBD. Stay safe.",user13,2025-11-01 14:00:00,Eldoret
+14,"Just planted 100 trees in Karura Forest. #GreenKenya",user14,2025-11-01 14:15:00,Nairobi
+15,"Ambulance needed at Nyeri General Hospital — road accident.",user15,2025-11-01 14:30:00,Nyeri
+16,"New tech hub launching in Konza City next week!",user16,2025-11-01 15:00:00,Konza
+17,"Flooding in Kakamega — avoid low-lying areas.",user17,2025-11-01 15:30:00,Kakamega
+18,"Farmers' market in Meru is buzzing! Fresh produce everywhere.",user18,2025-11-01 16:00:00,Meru
+19,"Supermarket looted in Kitale. Police on the way.",user19,2025-11-01 16:30:00,Kitale
+20,"Sunset at Lake Naivasha is magical. Highly recommend!",user20,2025-11-01 17:00:00,Naivasha
+21,"Peaceful march starting from Garissa University now.",user21,2025-11-01 17:15:00,Garissa
+22,"Power outage in Malindi — KPLC says 2 hours to restore.",user22,2025-11-01 17:45:00,Malindi
+23,"Tear gas used in Bungoma town. Protesters dispersed.",user23,2025-11-01 18:00:00,Bungoma
+24,"New playground opened in Embu! Kids are loving it.",user24,2025-11-01 18:30:00,Embu
+25,"Railway line blocked in Machakos. Trains delayed.",user25,2025-11-01 19:00:00,Machakos
+26,"Best nyama choma in Nanyuki! Come try at Moonlight Grill.",user26,2025-11-01 19:30:00,Nanyuki
+27,"Youths attacking supply trucks in Isiolo. Avoid the highway.",user27,2025-11-01 20:00:00,Isiolo
+28,"Free Wi-Fi now available at Lamu Old Town!",user28,2025-11-01 20:30:00,Lamu
+29,"Water cannon deployed in Homa Bay. Situation tense.",user29,2025-11-01 21:00:00,Homa Bay
+30,"Proud to see Kenyan athletes win gold at the marathon in Iten!",user30,2025-11-01 21:30:00,Iten
