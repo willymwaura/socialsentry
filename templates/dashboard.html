@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SocialSentry — National Threat Dashboard</title>
-
-  <!-- Tailwind -->
+  <title>SocialSentry — Tactical Intelligence Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -14,344 +12,202 @@
         extend: {
           colors: {
             primary: '#00D4FF', danger: '#FF2D55', warning: '#FF9500', success: '#30D158', dark: '#0F172A',
-            glass: 'rgba(15, 23, 42, 0.72)',
-          },
-          animation: {
-            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-            'float': 'float 6s ease-in-out infinite',
-            'scan': 'scan 2s linear infinite',
-            'glow': 'glow 2s ease-in-out infinite alternate',
-          },
-          keyframes: {
-            float: { '0%,100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-20px)' } },
-            scan: { '0%': { transform: 'translateY(-100%)' }, '100%': { transform: 'translateY(100%)' } },
-            glow: { '0%': { boxShadow: '0 0 10px #00D4FF' }, '100%': { boxShadow: '0 0 30px #00D4FF, 0 0 50px #00D4FF' } }
           }
         }
       }
     }
   </script>
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { font-family: 'Inter', sans-serif; }
-    h1, h2, .font-orbitron { font-family: 'Orbitron', sans-serif; }
-    .glass { background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 212, 255, 0.2); }
-    .scan-line::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #00D4FF, transparent); animation: scan 2s linear infinite; }
-    .neon-border { border: 1px solid #00D4FF; box-shadow: 0 0 10px #00D4FF; animation: glow 2s ease-in-out infinite alternate; }
-  </style>
-
-  <!-- Leaflet -->
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    h1, h2, h3, .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .glass { background: rgba(15, 23, 42, 0.72); backdrop-filter: blur(12px); border: 1px solid rgba(0, 212, 255, 0.1); }
+    /* HITL Status Styles */
+    .status-verified { border-left: 8px solid #30D158 !important; background: rgba(48, 209, 88, 0.05); }
+    .status-dismissed { opacity: 0.35; filter: grayscale(1); pointer-events: none; }
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0, 212, 255, 0.2); border-radius: 10px; }
+  </style>
 </head>
 <body class="bg-dark text-white min-h-screen">
 
-  <!-- HEADER -->
   <header class="border-b border-primary/20 glass sticky top-0 z-50">
     <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
       <div class="flex items-center gap-4">
-        <div class="w-14 h-14 bg-gradient-to-br from-primary to-cyan-400 rounded-xl flex items-center justify-center animate-pulse-slow neon-border">
-          <span class="text-3xl text-black font-bold">Shield</span>
+        <div class="w-12 h-12 bg-primary rounded-xl flex items-center justify-center animate-pulse shadow-[0_0_20px_#00D4FF]">
+          <i class="fa-solid fa-satellite text-black text-2xl"></i>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-primary font-orbitron">SocialSentry</h1>
-          <p class="text-sm opacity-70">Real-Time National Threat Intelligence</p>
+          <h1 class="text-2xl font-bold text-primary font-orbitron tracking-tight uppercase">SocialSentry</h1>
+          <p class="text-[9px] uppercase tracking-[0.3em] opacity-50">Signal Intelligence Hub</p>
         </div>
       </div>
-      <div class="text-right">
-        <div id="clock" class="text-2xl font-mono text-primary font-orbitron">12:36:00 AM</div>
-        <div class="text-xs opacity-70">Nairobi, Kenya • <span id="date">16 Nov 2025</span></div>
+      <div class="text-right hidden sm:block">
+        <div id="clock" class="text-xl font-mono text-primary font-orbitron">00:00:00</div>
+        <div class="text-[10px] opacity-60">LOCAL OPS TIME (EAT)</div>
       </div>
     </div>
   </header>
 
-  <div class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-
-    <!-- LEFT: ALERTS -->
-    <div class="lg:col-span-2">
-      <div class="glass rounded-2xl p-6 shadow-2xl neon-border">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold flex items-center gap-2 font-orbitron">
-            <span class="animate-pulse text-danger">LIVE</span> THREAT STREAM
+  <main class="max-w-7xl mx-auto p-4 grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+    <!-- INTEL FEED -->
+    <div class="lg:col-span-2 space-y-6">
+      <div class="glass rounded-2xl p-6 shadow-2xl">
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-lg font-bold font-orbitron flex items-center gap-3">
+            <span class="w-2 h-2 bg-danger rounded-full animate-ping"></span> 
+            ENCRYPTED SIGNAL STREAM
           </h2>
-          <div class="flex items-center gap-3">
-            <span id="alertCount" class="text-sm bg-primary/20 px-4 py-1 rounded-full font-bold">0 Total</span>
-            <div class="w-3 h-3 bg-danger rounded-full animate-ping"></div>
+          <div id="stats" class="text-[10px] font-bold opacity-60 uppercase tracking-widest">
+            <span id="vCount" class="text-success">0</span> Verified • <span id="pCount" class="text-warning">0</span> Pending
           </div>
         </div>
-
-        <!-- FILTER BAR (Always visible) -->
-        <div id="filterBar" class="mb-6"></div>
-
-        <!-- ALERTS (Taller container) -->
-        <div id="alertsContainer" class="space-y-4 max-h-screen overflow-y-auto pr-2 scan-line relative" style="max-height: calc(100vh - 320px);">
-          <div class="text-center py-16 text-gray-400">
-            <div class="w-16 h-16 mx-auto mb-4 border-4 border-dashed border-primary/30 rounded-full animate-spin"></div>
-            <p class="text-xl font-orbitron">SYSTEM ONLINE</p>
-            <p class="text-sm mt-2">Loading alerts...</p>
-          </div>
+        
+        <div id="alertsContainer" class="space-y-4 overflow-y-auto pr-3 custom-scrollbar" style="max-height: calc(100vh - 300px);">
+          <div class="text-center py-20 opacity-30 italic">Initializing signal Uplink...</div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: ANALYZER + MAP + STATS -->
-    <div class="space-y-6 flex flex-col">
+    <!-- SIDEBAR TOOLS -->
+    <div class="space-y-6">
+      <div class="glass rounded-2xl p-4 h-[350px] relative overflow-hidden">
+        <h3 class="text-[10px] font-bold font-orbitron mb-3 text-primary uppercase">Tactical Map Overlay</h3>
+        <div id="map" class="w-full h-full rounded-xl border border-primary/10 bg-black/20"></div>
+      </div>
 
-      <!-- AI Analyzer -->
-      <div class="glass rounded-2xl p-6 neon-border flex-shrink-0">
-        <h2 class="text-xl font-bold mb-4 font-orbitron">AI Threat Analyzer</h2>
-        <textarea id="tweetInput" placeholder="Paste message..." class="w-full p-3 rounded-lg bg-black/30 border border-primary/40 text-white placeholder-gray-400 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/50 transition resize-none" rows="4"></textarea>
-        <button id="analyzeBtn" class="mt-4 w-full py-3 rounded-lg font-bold text-black bg-gradient-to-r from-primary to-cyan-400 hover:from-cyan-400 hover:to-primary disabled:opacity-50 disabled:cursor-not-allowed transition transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg">
-          ANALYZE THREAT
+      <div class="glass rounded-2xl p-6">
+        <h3 class="text-[10px] font-bold font-orbitron mb-4 text-primary uppercase">Manual Command</h3>
+        <textarea id="tweetInput" placeholder="Input raw message text..." class="w-full p-4 rounded-xl bg-black/40 border border-primary/10 text-sm focus:border-primary/40 outline-none transition h-24 resize-none"></textarea>
+        <button id="analyzeBtn" class="w-full mt-4 py-4 bg-primary text-black font-black rounded-xl hover:shadow-[0_0_20px_rgba(0,212,255,0.4)] transition-all active:scale-95 text-[10px] uppercase font-orbitron">
+          Process Signal
         </button>
-        <pre id="result" class="mt-4 p-4 rounded-lg bg-black/50 border border-primary/30 text-xs whitespace-pre-wrap font-mono text-green-400 hidden overflow-x-auto"></pre>
       </div>
 
-      <!-- MAP WITH FULLSCREEN -->
-      <div class="glass rounded-2xl p-4 flex-grow min-h-0 neon-border overflow-hidden relative">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="text-lg font-bold font-orbitron">THREAT MAP</h3>
-          <button id="fullscreenMapBtn" class="text-primary hover:text-cyan-300 transition">
-            <i class="fa-solid fa-expand text-xl"></i>
-          </button>
-        </div>
-        <div id="map" class="w-full h-full rounded-lg border border-primary/30" style="min-height: 300px;"></div>
-      </div>
-
-      <!-- Stats -->
-      <div class="grid grid-cols-2 gap-4 flex-shrink-0">
-        <div class="glass p-5 rounded-xl text-center border border-danger/50 neon-border">
-          <div id="criticalCount" class="text-4xl font-bold text-danger font-orbitron">0</div>
-          <div class="text-xs opacity-70 mt-1">CRITICAL</div>
-        </div>
-        <div class="glass p-5 rounded-xl text-center border border-warning/50">
-          <div id="highCount" class="text-4xl font-bold text-warning font-orbitron">0</div>
-          <div class="text-xs opacity-70 mt-1">HIGH</div>
-        </div>
+      <div class="glass p-5 rounded-2xl border-l-4 border-danger">
+        <div id="criticalCount" class="text-4xl font-bold font-orbitron text-danger">0</div>
+        <div class="text-[9px] opacity-50 uppercase font-black tracking-widest mt-1">High-Risk Detections</div>
       </div>
     </div>
-  </div>
+  </main>
 
-  <!-- FULLSCREEN MAP PAGE -->
-  <div id="fullscreenMap" class="fixed inset-0 bg-dark z-50 hidden flex flex-col">
-    <div class="glass p-4 border-b border-primary/20 flex justify-between items-center">
-      <h2 class="text-2xl font-bold font-orbitron text-primary">Full-Screen Threat Map</h2>
-      <button id="closeFullscreenBtn" class="text-primary hover:text-danger text-2xl">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
-    </div>
-    <div id="fullscreenMapContainer" class="flex-grow"></div>
-  </div>
-
-  <!-- FOOTER -->
-  <footer class="mt-12 text-center text-xs opacity-50 pb-6">
-    SocialSentry © 2025 | Built in Kenya | Powered by AI
-  </footer>
-
-  <!-- JS -->
   <script>
-    // ========== CLOCK ==========
     function updateClock() {
       const now = new Date();
-      const opts = { timeZone: 'Africa/Nairobi', hour12: true };
-      document.getElementById('clock').textContent = now.toLocaleTimeString('en-KE', opts);
-      document.getElementById('date').textContent = now.toLocaleDateString('en-KE', {day:'numeric', month:'short', year:'numeric'});
+      document.getElementById('clock').textContent = now.toLocaleTimeString('en-KE', { hour12: false });
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ========== ELEMENTS ==========
-    const alertsContainer = document.getElementById('alertsContainer');
-    const filterBar = document.getElementById('filterBar');
-    const alertCount = document.getElementById('alertCount');
-    const criticalCount = document.getElementById('criticalCount');
-    const highCount = document.getElementById('highCount');
-    const tweetInput = document.getElementById('tweetInput');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const resultPre = document.getElementById('result');
-    const fullscreenBtn = document.getElementById('fullscreenMapBtn');
-    const fullscreenMap = document.getElementById('fullscreenMap');
-    const closeFullscreenBtn = document.getElementById('closeFullscreenBtn');
-    const fullscreenMapContainer = document.getElementById('fullscreenMapContainer');
+    let mainMap, markerLayer;
 
-    // ========== ICONS ==========
-    const ICONS = {
-      terrorism: 'fa-bomb', hate_speech: 'fa-face-angry', civil_unrest: 'fa-people-arrows',
-      misinformation: 'fa-triangle-exclamation', safety_report: 'fa-shield-halved', none: 'fa-circle-info'
-    };
-
-    // ========== FILTER ==========
-    let currentFilter = 'all';
-    const FILTERS = [
-      { id: 'all', label: 'All', min: 1, max: 5 },
-      { id: 'critical', label: 'Critical', min: 4, max: 5 },
-      { id: 'high', label: 'High', min: 3, max: 3 },
-      { id: 'medium', label: 'Medium', min: 2, max: 2 },
-      { id: 'low', label: 'Low', min: 1, max: 1 }
-    ];
-
-    function renderFilterBar() {
-      return `
-        <div class="flex flex-wrap gap-3 justify-center">
-          ${FILTERS.map(f => `
-            <button class="filter-btn px-5 py-2 rounded-full font-bold text-sm transition-all neon-border
-                     ${currentFilter === f.id ? 'bg-primary text-black shadow-lg scale-105' : 'bg-white/10 text-white hover:bg-white/20'}"
-                    data-filter="${f.id}">${f.label}</button>
-          `).join('')}
-        </div>`;
-    }
-
-    // ========== MAPS ==========
-    let mainMap, fullscreenMapInstance, markerLayer;
-
-    function initMainMap() {
-      mainMap = L.map('map').setView([-1.2921, 36.8219], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(mainMap);
+    function initMap() {
+      mainMap = L.map('map', { zoomControl: false, attributionControl: false }).setView([-1.2921, 36.8219], 6);
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(mainMap);
       markerLayer = L.layerGroup().addTo(mainMap);
     }
 
-    function initFullscreenMap() {
-      fullscreenMapInstance = L.map('fullscreenMapContainer').setView([-1.2921, 36.8219], 6);
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(fullscreenMapInstance);
-      markerLayer.addTo(fullscreenMapInstance); // ← SAME LAYER
-      setTimeout(() => fullscreenMapInstance.invalidateSize(), 100);
-    }
-
-    function updateMap(alerts) {
-      markerLayer.clearLayers();
-      alerts.forEach(alert => {
-        const loc = alert.location;
-        if (!loc.lat || !loc.lng) return;
-        const sev = alert.analysis.severity;
-        const color = sev >= 4 ? '#FF2D55' : sev >= 3 ? '#FF9500' : sev === 2 ? '#FFD60A' : '#30D158';
-        const icon = L.divIcon({
-          className: 'glowing-pin',
-          html: `<div style="width:16px;height:16px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 0 15px ${color},0 0 30px ${color};animation:pulse-glow 2s infinite;"></div>`,
-          iconSize: [16, 16], iconAnchor: [8, 8]
-        });
-        L.marker([loc.lat, loc.lng], { icon }).addTo(markerLayer)
-         .bindPopup(`<b>${alert.analysis.category.toUpperCase()} • L${sev}</b><br>"${alert.text}"<br><small>@${alert.meta.user} • ${loc.label}</small>`);
+    // HITL FUNCTION: Updates status in database via backend
+    async function handleHITL(id, status) {
+      const res = await fetch('/update_status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ alert_id: id, status: status })
       });
+      if (res.ok) fetchAlerts(); // Re-render immediately
     }
 
-    const glowStyle = document.createElement('style');
-    glowStyle.textContent = `@keyframes pulse-glow {0%,100%{box-shadow:0 0 15px var(--c),0 0 30px var(--c)}50%{box-shadow:0 0 25px var(--c),0 0 50px var(--c)}}`;
-    document.head.appendChild(glowStyle);
-
-    // ========== RENDER ALERTS ==========
     function renderAlerts(alerts) {
-      const critical = alerts.filter(a => a.analysis.severity >= 4).length;
-      const high = alerts.filter(a => a.analysis.severity === 3).length;
-      criticalCount.textContent = critical;
-      highCount.textContent = high;
-      alertCount.textContent = `${alerts.length} Total`;
+      document.getElementById('vCount').textContent = alerts.filter(a => a.status === 'verified').length;
+      document.getElementById('pCount').textContent = alerts.filter(a => a.status === 'pending').length;
+      document.getElementById('criticalCount').textContent = alerts.filter(a => a.analysis.severity >= 4 && a.status !== 'dismissed').length;
+      
+      markerLayer.clearLayers();
+      const container = document.getElementById('alertsContainer');
+      
+      container.innerHTML = alerts.map(alert => {
+        const a = alert.analysis;
+        const status = alert.status || 'pending';
+        const isVerified = status === 'verified';
+        const isDismissed = status === 'dismissed';
+        const sevColor = a.severity >= 4 ? '#FF2D55' : a.severity >= 3 ? '#FF9500' : '#30D158';
 
-      const filtered = alerts.filter(a => {
-        const sev = a.analysis.severity;
-        const f = FILTERS.find(f => f.id === currentFilter);
-        return sev >= f.min && sev <= f.max;
-      });
+        // Add markers for map
+        if (alert.location.lat && !isDismissed) {
+          L.circleMarker([alert.location.lat, alert.location.lng], {
+            radius: 7, color: sevColor, fillColor: sevColor, fillOpacity: 0.7, weight: 1
+          }).addTo(markerLayer);
+        }
 
-      filterBar.innerHTML = renderFilterBar();
-
-      alertsContainer.innerHTML = filtered.length === 0 ?
-        `<div class="text-center py-12 text-gray-400">
-          <p class="text-lg">No alerts match this filter.</p>
-          <p class="text-sm mt-2">Try another level.</p>
-        </div>` :
-        `<div class="space-y-5">${filtered.map((alert, i) => {
-          const a = alert.analysis;
-          const sevColor = a.severity >= 4 ? '#FF2D55' : a.severity >= 3 ? '#FF9500' : '#30D158';
-          const bgClass = a.severity >= 4 ? 'bg-danger' : a.severity >= 3 ? 'bg-warning' : 'bg-success';
-          const iconCls = ICONS[a.category] || 'fa-circle-question';
-
-          return `
-            <div class="glass rounded-xl p-6 border-l-5  neon-border"
-                 style="border-left-color:${sevColor};animation-delay:${i*0.1}s">
-              <div class="flex items-center gap-3 mb-3">
-                <i class="fa-solid ${iconCls} text-2xl"></i>
-                <span class="font-bold capitalize text-lg">${a.category.replace('_',' ')}</span>
-                <span class="ml-auto px-3 py-1 rounded text-sm font-bold text-white ${bgClass}">LEVEL ${a.severity}</span>
+        return `
+          <div class="glass rounded-xl p-6 border-l-4 transition-all duration-300 ${isVerified ? 'status-verified' : ''} ${isDismissed ? 'status-dismissed' : ''}" 
+               style="border-left-color: ${sevColor}">
+            <div class="flex justify-between items-start mb-4">
+              <div class="flex items-center gap-3">
+                <span class="text-[9px] font-black px-2 py-0.5 rounded bg-primary text-black uppercase tracking-widest">${a.category}</span>
+                <span class="text-[10px] font-bold text-white/30 italic">@${alert.meta.user} • ${alert.location.label}</span>
               </div>
-              <p class="text-sm opacity-90 mb-3 italic">"${alert.text}"</p>
-              <p class="text-xs opacity-60 mb-3">@${alert.meta.user} • ${alert.location.label} • ${new Date(alert.meta.created_at).toLocaleString('en-KE')}</p>
-              <div class="flex flex-wrap gap-2 mb-3">
-                ${a.indicators.map(ind=>`<span class="text-xs bg-primary/30 px-3 py-1 rounded-full font-mono">#${ind}</span>`).join('')}
+              <div class="text-[10px] font-black px-2 py-0.5 rounded bg-white/5 text-white/60">SEV ${a.severity}</div>
+            </div>
+            
+            <p class="text-sm mb-4 leading-relaxed text-white/90 italic">"${alert.text}"</p>
+            
+            <div class="bg-black/30 p-4 rounded-xl border border-white/5 text-[11px] mb-5 leading-relaxed">
+              <span class="text-primary font-bold uppercase tracking-tighter block mb-1">AI Analyst Assessment:</span>
+              ${a.summary}
+            </div>
+            
+            <div class="flex justify-between items-center border-t border-white/5 pt-4">
+              <div class="flex gap-2">
+                ${a.indicators.map(i => `<span class="text-[9px] text-primary/40 font-mono">#${i}</span>`).join(' ')}
               </div>
-              <div class="glass rounded-lg p-3 text-sm bg-black/40 border border-primary/30">
-                <p class="font-semibold text-primary mb-1">AI Summary:</p>
-                <p class="leading-relaxed">${a.summary || 'No summary.'}</p>
+              <div class="flex gap-3">
+                ${status === 'pending' ? `
+                  <button onclick="handleHITL(${alert.id}, 'dismissed')" class="px-4 py-1.5 bg-white/5 hover:bg-danger/20 rounded-lg text-[10px] font-bold transition-all uppercase">Dismiss</button>
+                  <button onclick="handleHITL(${alert.id}, 'verified')" class="px-4 py-1.5 bg-primary text-black rounded-lg text-[10px] font-black hover:bg-cyan-400 transition-all uppercase">Verify</button>
+                ` : `
+                  <div class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest ${isVerified ? 'text-success' : 'text-white/20'}">
+                    <i class="fa-solid ${isVerified ? 'fa-check-circle' : 'fa-times-circle'}"></i> ${status}
+                  </div>
+                `}
               </div>
-            </div>`;
-        }).join('')}</div>`;
-
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.onclick = () => { currentFilter = btn.dataset.filter; renderAlerts(alerts); };
-      });
-
-      updateMap(alerts);
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
-    // ========== FETCH ==========
     async function fetchAlerts() {
-      try {
-        const res = await fetch('/alerts');
-        const alerts = await res.json();
-        renderAlerts(alerts || []);
-      } catch (e) {
-        console.error('Fetch failed:', e);
-        filterBar.innerHTML = renderFilterBar();
-        alertsContainer.innerHTML = `<div class="text-center py-12 text-red-400">Connection failed. Retrying...</div>`;
-      }
+      const res = await fetch('/alerts');
+      const data = await res.json();
+      renderAlerts(data);
     }
 
-    // ========== ANALYZE ==========
-    analyzeBtn.onclick = async () => {
-      const text = tweetInput.value.trim();
+    document.getElementById('analyzeBtn').onclick = async () => {
+      const btn = document.getElementById('analyzeBtn');
+      const text = document.getElementById('tweetInput').value;
       if (!text) return;
-      analyzeBtn.disabled = true;
-      analyzeBtn.innerHTML = 'ANALYZING...';
-      try {
-        const res = await fetch('/analyze', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({text}) });
-        const data = await res.json();
-        resultPre.textContent = JSON.stringify(data.analysis || data, null, 2);
-        resultPre.classList.remove('hidden');
-        tweetInput.value = '';
-      } catch (e) {
-        resultPre.textContent = 'ERROR';
-        resultPre.classList.remove('hidden');
-      } finally {
-        analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = 'ANALYZE THREAT';
-      }
-    };
-
-    // ========== FULLSCREEN MAP ==========
-    fullscreenBtn.onclick = () => {
-      fullscreenMap.classList.remove('hidden');
-      setTimeout(() => {
-        initFullscreenMap();
-        fetchAlerts(); // Refresh data
-      }, 150);
-    };
-
-    closeFullscreenBtn.onclick = () => {
-      fullscreenMap.classList.add('hidden');
-      if (fullscreenMapInstance) fullscreenMapInstance.remove();
-      fullscreenMapInstance = null;
-    };
-
-    // ========== INIT ==========
-    document.addEventListener('DOMContentLoaded', () => {
-      initMainMap();
+      btn.textContent = 'Processing...';
+      btn.disabled = true;
+      await fetch('/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text })
+      });
+      document.getElementById('tweetInput').value = '';
+      btn.textContent = 'Process Signal';
+      btn.disabled = false;
       fetchAlerts();
-      setInterval(fetchAlerts, 3000);
-    });
+    };
+
+    window.onload = () => {
+      initMap();
+      fetchAlerts();
+      setInterval(fetchAlerts, 5000); // Live polling
+    };
   </script>
 </body>
 </html>
