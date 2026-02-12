@@ -1,1 +1,4 @@
-to be added
+we are using claude for tweets processing 
+python developemnt env 
+postgresql db 
+to be deployed in railway.app
